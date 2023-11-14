@@ -62,7 +62,8 @@ def main():
     json_data = read_json_from_url(url)
     #json_data=data_encryption()
     #json_data='{"inputs":["coding","its harder to read code than to write it"]}'
-    data_dict=json.loads(json_data)
+    json_string= json.dumps(json_data)
+    data_dict=json.loads(json_string)
     my_list=data_dict['json_data']
     List=[]
     for x in my_list:
