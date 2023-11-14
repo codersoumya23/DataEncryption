@@ -1,7 +1,7 @@
 import json
 import math
 import re
-from flask import Flask
+from flask import Flask, request
 from urllib.request import urlopen
 def string_to_matrix(input,row,col,List):
     matrix=[[' ' for _ in range(col)] for _ in range(row)]
@@ -26,16 +26,41 @@ def calc(input_str,List):
 
 app=Flask(__name__)
 
-# @app.route('/data-encryption',methods=['GET'])
-def data_encryption():
-    url = "http://127.0.0.1:5000/data-encrpytion"
-    response = urlopen(url)
-    data_json = json.loads(response.read())
-    return data_json
-
 @app.route('/data-encryption',methods=['POST'])
+def read_json_from_url(url):
+    try:
+        # Make an HTTP GET request to the URL
+        response = request.get(url)
+
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            # Parse the JSON content
+            json_data = response.json()
+            return json_data
+        else:
+            # Print an error message if the request was not successful
+            print(f"Failed to fetch data. Status code: {response.status_code}")
+            return None
+
+    except Exception as e:
+        # Handle exceptions
+        print(f"Error: {e}")
+        return None
+
+# Example URL with JSON data
+url = "http://127.0.0.1:5000"
+
+# Read JSON from the given URL
+json_data = read_json_from_url(url)
+
+
+
 def main():
-    json_data=data_encryption()
+    url = "http://127.0.0.1:5000"
+
+# Read JSON from the given URL
+    json_data = read_json_from_url(url)
+    #json_data=data_encryption()
     #json_data='{"inputs":["coding","its harder to read code than to write it"]}'
     data_dict=json.loads(json_data)
     my_list=data_dict['json_data']
