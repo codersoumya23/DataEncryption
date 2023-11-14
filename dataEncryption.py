@@ -1,7 +1,7 @@
 import json
 import math
 import re
-from flask import Flask,request
+from flask import Flask
 from urllib.request import urlopen
 def string_to_matrix(input,row,col,List):
     matrix=[[' ' for _ in range(col)] for _ in range(row)]
