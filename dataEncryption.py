@@ -28,7 +28,7 @@ app=Flask(__name__)
 
 
 def data_encryption():
-    url = "https://api.github.com"
+    url = "https://127.0.01:5000/data-encryption"
     response = urlopen(url)
     data_json = json.loads(response.read())
     return data_json
