@@ -26,9 +26,9 @@ def calc(input_str,List):
 
 app=Flask(__name__)
 
-
+# @app.route('/data-encryption',methods=['GET'])
 def data_encryption():
-    url = "https://127.0.01:5000"
+    url = "http://127.0.0.1:5000"
     response = urlopen(url)
     data_json = json.loads(response.read())
     return data_json
