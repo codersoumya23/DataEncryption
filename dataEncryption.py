@@ -27,9 +27,9 @@ app=Flask(__name__)
 
 @app.route('/data-encryption',methods=['POST'])
 def main():
-    json_data=request.json
+    #json_data=request.get_json()
     #json_data='{"inputs":["coding","its harder to read code than to write it"]}'
-    data_dict=json.loads(json_data)
+    data_dict=json.loads()
     my_list=data_dict['inputs']
     List=[]
     for x in my_list:
