@@ -1,7 +1,7 @@
 import json
 import math
 import re
-from flask import Flask
+from flask import Flask,request
 def string_to_matrix(input,row,col,List):
     matrix=[[' ' for _ in range(col)] for _ in range(row)]
     for index in range(len(input)):
@@ -25,11 +25,16 @@ def calc(input_str,List):
 
 app=Flask(__name__)
 
+@app.route('/data-encryption', methods=['GET'])
+def data_encryption():
+    inputs = request.args.getlist('inputs')
+    return inputs
+
 @app.route('/data-encryption',methods=['POST'])
 def main():
-    #json_data=request.get_json()
+    json_data=data_encryption()
     #json_data='{"inputs":["coding","its harder to read code than to write it"]}'
-    data_dict=json.loads()
+    data_dict=json.loads(json_data)
     my_list=data_dict['inputs']
     List=[]
     for x in my_list:
@@ -43,4 +48,7 @@ def main():
 if __name__=="__main__":
     main()
     app.run(debug=True)
+
+
+
 
