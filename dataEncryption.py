@@ -28,7 +28,7 @@ app=Flask(__name__)
 
 # @app.route('/data-encryption',methods=['GET'])
 def data_encryption():
-    url = "http://127.0.0.1:5000"
+    url = "http://127.0.0.1:5000/data-encrpytion"
     response = urlopen(url)
     data_json = json.loads(response.read())
     return data_json
