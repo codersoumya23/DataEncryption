@@ -2,6 +2,7 @@ import json
 import math
 import re
 from flask import Flask,request
+from urllib.request import urlopen
 def string_to_matrix(input,row,col,List):
     matrix=[[' ' for _ in range(col)] for _ in range(row)]
     for index in range(len(input)):
@@ -25,10 +26,12 @@ def calc(input_str,List):
 
 app=Flask(__name__)
 
-@app.route('/data-encryption', methods=['GET'])
+
 def data_encryption():
-    inputs = request.args.getlist('inputs')
-    return inputs
+    url = "https://api.github.com"
+    response = urlopen(url)
+    data_json = json.loads(response.read())
+    return data_json
 
 @app.route('/data-encryption',methods=['POST'])
 def main():
