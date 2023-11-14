@@ -35,7 +35,7 @@ def main():
     json_data=data_encryption()
     #json_data='{"inputs":["coding","its harder to read code than to write it"]}'
     data_dict=json.loads(json_data)
-    my_list=data_dict['inputs']
+    my_list=data_dict['json_data']
     List=[]
     for x in my_list:
         calc(x,List)
