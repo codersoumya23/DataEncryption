@@ -37,7 +37,7 @@ def main():
     print(List)
     json_data={"answer":List}
     json_format=json.dumps(json_data,indent=2)
-    #print(json_format)
+    print(json_format)
     return json_format
 
 if __name__=="__main__":
