@@ -45,8 +45,7 @@ def main():
         return json_format
 
 if __name__=="__main__":
-
-    main()
+    #main()
     app.run(debug=True)
 
 
