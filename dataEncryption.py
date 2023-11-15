@@ -47,7 +47,7 @@ def main():
 if __name__=="__main__":
     #main()
     #app.run(debug=True)
-    app.run(host='0.0.0.0', port=4080, debug=True)
+    app.run(host='127.2.3.1', port=4080, debug=True)
 
 
 
