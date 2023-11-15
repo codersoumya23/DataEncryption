@@ -30,18 +30,19 @@ app=Flask(__name__)
 
 @app.route('/data-encryption',methods=['POST'])
 def main():
-    json_data=request.get_json()
-    #json_data='{"inputs":["coding","its harder to read code than to write it"]}'
-    data_dict=json.loads(json_data)
-    my_list=data_dict['inputs']
-    List=[]
-    for x in my_list:
-        calc(x,List)
-    print(List)
-    json_data={"answer":List}
-    json_format=json.dumps(json_data,indent=2)
-    print(json_format)
-    return json_format
+    if request.is_json:
+        json_data=request.get_json()
+        #json_data='{"inputs":["coding","its harder to read code than to write it"]}'
+        data_dict=json.loads(json_data)
+        my_list=data_dict['inputs']
+        List=[]
+        for x in my_list:
+            calc(x,List)
+        print(List)
+        json_data={"answer":List}
+        json_format=json.dumps(json_data,indent=2)
+        print(json_format)
+        return json_format
 
 if __name__=="__main__":
     main()
