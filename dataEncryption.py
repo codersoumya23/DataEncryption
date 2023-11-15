@@ -3,6 +3,7 @@ import math
 import re
 from flask import Flask, request
 
+app=Flask(__name__)
 def string_to_matrix(input,row,col,List):
 
     matrix=[[' ' for _ in range(col)] for _ in range(row)]
@@ -25,12 +26,11 @@ def calc(input_str,List):
 
     string_to_matrix(input,row,col,List)
 
-app=Flask(__name__)
 
 
 @app.route('/data-encryption',methods=['POST'])
 def main():
-    if request.is_json:
+
         json_data=request.get_json()
         #json_data='{"inputs":["coding","its harder to read code than to write it"]}'
         data_dict=json.loads(json_data)
@@ -45,6 +45,7 @@ def main():
         return json_format
 
 if __name__=="__main__":
+
     main()
     app.run(debug=True)
 
