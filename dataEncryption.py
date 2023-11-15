@@ -2,7 +2,7 @@ import json
 import math
 import re
 from flask import Flask, request
-from urllib.request import urlopen
+
 def string_to_matrix(input,row,col,List):
 
     matrix=[[' ' for _ in range(col)] for _ in range(row)]
@@ -45,7 +45,7 @@ def main():
 
 if __name__=="__main__":
     main()
-    app.run(debug=true)
+    app.run(debug=True)
 
 
 
