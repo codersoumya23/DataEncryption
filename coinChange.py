@@ -5,16 +5,16 @@ import re
 
 app = Flask(__name__)
 
+
 # Your existing JSON processing function
 def process_json(data):
-
-    all_list=[]
+    all_list = []
     for inputs_set in data['inputs']:
-        List=[]
-        n=inputs_set[0]
-        names=re.split('\s', inputs_set[1])
+        List = []
+        n = inputs_set[0]
+        names = re.split('\s', inputs_set[1])
 
-        for i in range(2,len(inputs_set)):
+        for i in range(2, len(inputs_set)):
             List.append(inputs_set[i])
 
         xy_split = [tuple(map(int, value.split())) for value in List]
@@ -33,7 +33,7 @@ def process_json(data):
 
         df_result = df_result[:-1]
         df_result = df_result.astype(int)
-        df_result['Names'] = [[] for _ in range(len(inputs_set)-2)]
+        df_result['Names'] = [[] for _ in range(len(inputs_set) - 2)]
 
         for i in range(len(df)):
             row = df.iloc[i]
@@ -41,19 +41,20 @@ def process_json(data):
                 row1 = df_result.iloc[j]
 
                 if row1['x1'] >= row['x'] and row['y'] >= row1['y1'] and row['abs_diff'] >= 0:
-                    #print(row['name'])
+                    # print(row['name'])
                     df_result.at[j, 'Names'].append(row['name'])
-                    #print(df_result)
+                    # print(df_result)
                     row['abs_diff'] -= 1
-                    #print(row['abs_diff'])
+                    # print(row['abs_diff'])
         df_result.insert(df_result.columns.get_loc("Names"), "NumStrings", df_result["Names"].apply(len))
         df_result['Names'] = df_result['Names'].apply(sorted)
-        formatted_data = df_result.apply(lambda row: f"{row['x1']} {row['y1']} {row['NumStrings']} {' '.join(row['Names'])}", axis=1)
+        formatted_data = df_result.apply(
+            lambda row: f"{row['x1']} {row['y1']} {row['NumStrings']} {' '.join(row['Names'])}", axis=1)
 
         list_of_strings = formatted_data.tolist()
 
         list_of_strings.insert(0, n)
-        #print(df_result)
+        # print(df_result)
         all_list.append(list_of_strings)
     result_dict = {"answer": all_list}
     return result_dict
@@ -70,6 +71,7 @@ def time_intervals_post():
         except Exception as e:
             return jsonify({"error": str(e)}), 400
 
+
 # Expose a GET endpoint /time-intervals
 @app.route('/time-intervals', methods=['GET'])
 def time_intervals_get():
@@ -80,5 +82,6 @@ def time_intervals_get():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=4094,debug=True)
+    app.run(host='0.0.0.0', port=4094, debug=True)
