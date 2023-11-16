@@ -2,50 +2,67 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-def get_intervals(n, employees, shifts):
-    result = []
+def max_risk_mitigation(n, m, costs):
+    max_mitigation = 0
 
-    intervals = []
-    for i in range(n):
-        for j in range(shifts[i][0], shifts[i][1]):
-            intervals.append((j, i, employees[i]))
+    for i in range(m):
+        for j in range(i + 1, m):
+            risk_mitigation = costs[j] - costs[i]
 
-    intervals.sort()
+            if risk_mitigation > max_mitigation:
+                max_mitigation = risk_mitigation
 
-    output_intervals = []
-    current_interval = intervals[0]
-    for i in range(1, len(intervals)):
-        if intervals[i][0] != current_interval[0]:
-            output_intervals.append(current_interval)
-            current_interval = intervals[i]
-        else:
-            current_interval = (current_interval[0], current_interval[1], current_interval[2] + " " + intervals[i][2])
+    return max_mitigation
 
-    output_intervals.append(current_interval)
+def validate_inputs(inputs):
+    for input_data in inputs:
+        if len(input_data) != 2:
+            return False
+        try:
+            n, m = map(int, input_data[0].split())
+            costs = list(map(int, input_data[1].split()))
+            if n < 0 or m < 0 or len(costs) != m:
+                return False
+        except ValueError:
+            return False
 
-    result.append([len(output_intervals)] + [" ".join(map(str, interval)) for interval in output_intervals])
+    return True
 
-    return {"answer": result}
-
-@app.route('/time-intervals', methods=['GET', 'POST'])
-def time_intervals():
-    if request.method == 'GET':
-        n = int(request.args.get('n'))
-        employees = request.args.get('employees').split(',')
-        shifts = [(int(request.args.get(f'shifts[{i}][0]')), int(request.args.get(f'shifts[{i}][1]'))) for i in range(n)]
-
-        response = get_intervals(n, employees, shifts)
-        return jsonify(response)
-
+@app.route('/risk-mitigation', methods=['POST', 'GET'])
+def risk_mitigation():
     if request.method == 'POST':
-        data = request.json
-        inputs = data.get('inputs')
-        if not inputs:
-            return jsonify({"error": "Invalid data format."}), 400
+        request_data = request.get_json()
 
-        response = get_intervals(int(inputs[0]), inputs[1].split(','), [(int(inputs[i]), int(inputs[i+1])) for i in range(2, 2*int(inputs[0])+1, 2)])
-        return jsonify(response)
+        if "inputs" in request_data:
+            inputs = request_data["inputs"]
 
+            if not validate_inputs(inputs):
+                return jsonify({"error": "Invalid input format"}), 400
+
+            results = []
+            for input_data in inputs:
+                n, m = map(int, input_data[0].split())
+                costs = list(map(int, input_data[1].split()))
+                result = max_risk_mitigation(n, m, costs)
+                results.append(result)
+
+            return jsonify({"answer": results})
+        else:
+            return jsonify({"error": "Invalid input format"}), 400
+    elif request.method == 'GET':
+        n = int(request.args.get('n', 0))
+        m = int(request.args.get('m', 0))
+        costs_str = request.args.get('costs', '')
+
+        try:
+            costs = list(map(int, costs_str.split()))
+            if n < 0 or m < 0 or len(costs) != m or m < n:
+                return jsonify({"error": "Invalid input format"}), 400
+        except ValueError:
+            return jsonify({"error": "Invalid input format"}), 400
+
+        result = max_risk_mitigation(n, m, costs)
+        return jsonify({"answer": result})
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=4089,debug=True)
