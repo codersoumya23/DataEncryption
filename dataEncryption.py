@@ -56,7 +56,7 @@ def main():
         json_response = {"answer": List}
         return jsonify(json_response)
 
-    return jsonify({"status": "success", "message": "GET request processed."})
+    #return jsonify({"status": "success", "message": "GET request processed."})
 
 if __name__ == "__main__":
     app.run(host='127.2.3.1', port=4080, debug=True)
