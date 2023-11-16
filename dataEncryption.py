@@ -4,6 +4,7 @@ import re
 from flask import Flask, request
 
 app=Flask(__name__)
+
 def string_to_matrix(input,row,col,List):
 
     matrix=[[' ' for _ in range(col)] for _ in range(row)]
@@ -49,7 +50,7 @@ if __name__=="__main__":
     #app.run(debug=True)
     app.run(host='127.2.3.1', port=4080, debug=True)
 
-
+server=app.server
 
 
 
