@@ -1,6 +1,7 @@
 import json
 import math
 import re
+import requests
 from flask import Flask, request
 
 app=Flask(__name__)
@@ -31,19 +32,20 @@ def calc(input_str,List):
 
 @app.route('/data-encryption',methods=['GET','POST'])
 def main():
-
+    if request.method == 'GET':
         json_data=request.get_json()
         #json_data='{"inputs":["coding","its harder to read code than to write it"]}'
-        data_dict=json.loads(json_data)
-        my_list=data_dict['inputs']
-        List=[]
-        for x in my_list:
-            calc(x,List)
+    data_dict=json.loads(json_data)
+    my_list=data_dict['inputs']
+    List=[]
+    for x in my_list:
+        calc(x,List)
         print(List)
-        json_data={"answer":List}
-        json_format=json.dumps(json_data,indent=2)
-        print(json_format)
-        return json_format
+        if request.method == 'POST':
+            json_data={"answer":List}
+            json_format=json.dumps(json_data,indent=2)
+            print(json_format)
+            return List
 
 if __name__=="__main__":
     #main()
