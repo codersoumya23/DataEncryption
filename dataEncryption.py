@@ -29,7 +29,7 @@ def calc(input_str,List):
 
 
 
-@app.route('/data-encryption',methods=['POST'])
+@app.route('/data-encryption',methods=['GET','POST'])
 def main():
 
         json_data=request.get_json()
@@ -50,7 +50,8 @@ if __name__=="__main__":
     #app.run(debug=True)
     app.run(host='127.2.3.1', port=4080, debug=True)
 
-server=app.server
+
+
 
 
 
