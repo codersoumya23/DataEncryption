@@ -1,52 +1,51 @@
 from flask import Flask, request, jsonify
 
-app = Flask(__name__)
+app = Flask(_name_)
 
-def count_ways_to_make_change(amount, coins):
-    dp = [0] * (amount + 1)
-    dp[0] = 1  # There is 1 way to make change for amount 0
+def get_intervals(n, employees, shifts):
+    result = []
 
-    for coin in coins:
-        for i in range(coin, amount + 1):
-            dp[i] += dp[i - coin]
+    intervals = []
+    for i in range(n):
+        for j in range(shifts[i][0], shifts[i][1]):
+            intervals.append((j, i, employees[i]))
 
-    return dp[amount]
+    intervals.sort()
 
-@app.route('/coin-change', methods=['GET', 'POST'])
-def coin_change():
+    output_intervals = []
+    current_interval = intervals[0]
+    for i in range(1, len(intervals)):
+        if intervals[i][0] != current_interval[0]:
+            output_intervals.append(current_interval)
+            current_interval = intervals[i]
+        else:
+            current_interval = (current_interval[0], current_interval[1], current_interval[2] + " " + intervals[i][2])
+
+    output_intervals.append(current_interval)
+
+    result.append([len(output_intervals)] + [" ".join(map(str, interval)) for interval in output_intervals])
+
+    return {"answer": result}
+
+@app.route('/time-intervals', methods=['GET', 'POST'])
+def time_intervals():
     if request.method == 'GET':
-        try:
-            amount = int(request.args.get('amount'))
-            num_coins = int(request.args.get('num_coins'))
-            coin_values = list(map(int, request.args.get('coins').split()))
+        n = int(request.args.get('n'))
+        employees = request.args.get('employees').split()
+        shifts = [(int(request.args.get(f'shifts[{i}][0]')), int(request.args.get(f'shifts[{i}][1]'))) for i in range(n)]
 
-            ways = count_ways_to_make_change(amount, coin_values)
+        response = get_intervals(n, employees, shifts)
+        return jsonify(response)
 
-            return jsonify({"answer": ways})
+    if request.method == 'POST':
+        data = request.json
+        inputs = data.get('inputs')
+        if not inputs:
+            return jsonify({"error": "Invalid data format."}), 400
 
-        except Exception as e:
-            return jsonify({"error": str(e)}), 400
+        response = get_intervals(inputs[0], inputs[1].split(), [(int(inputs[i]), int(inputs[i+1])) for i in range(2, 2*int(inputs[0])+1, 2)])
+        return jsonify(response)
 
-    elif request.method == 'POST':
-        try:
-            data = request.get_json(force=True)
-            inputs = data.get('inputs', [])
-
-            if not inputs:
-                return jsonify({"error": "No inputs provided"}), 400
-
-            results = []
-            for input_data in inputs:
-                amount, num_coins = map(int, input_data[0].split())
-                coin_values = list(map(int, input_data[1].split()))
-
-                ways = count_ways_to_make_change(amount, coin_values)
-                results.append(ways)
-
-            return jsonify({"answer": results})
-
-        except Exception as e:
-            return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=4087,debug=True)
+    app.run(host='0.0.0.0', port=4088,debug=True)
