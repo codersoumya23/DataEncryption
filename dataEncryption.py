@@ -5,14 +5,29 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
+# def string_to_matrix(input, row, col, List):
+#     matrix = [[' ' for _ in range(col)] for _ in range(row)]
+#     for index in range(len(input)):
+#         matrix[index // col][index % col] = input[index]
+#
+#     matrix1 = [list(row) for row in zip(*matrix)]
+#     res = ' '.join([''.join(row) for row in matrix1])
+#     List.append(res)
+
 def string_to_matrix(input, row, col, List):
     matrix = [[' ' for _ in range(col)] for _ in range(row)]
-    for index in range(len(input)):
-        matrix[index // col][index % col] = input[index]
+    index = 0
+
+    for i in range(row):
+        for j in range(col):
+            if index < len(input):
+                matrix[i][j] = input[index]
+                index += 1
 
     matrix1 = [list(row) for row in zip(*matrix)]
     res = ' '.join([''.join(row) for row in matrix1])
     List.append(res)
+
 
 def calc(input_str, List):
     input = ''.join(re.findall(r'[a-zA-Z]+', input_str))
@@ -56,7 +71,7 @@ def main():
         json_response = {"answer": List}
         return jsonify(json_response)
 
-    #return jsonify({"status": "success", "message": "GET request processed."})
+    return jsonify({"status": "success", "message": "GET request processed."})
 
 if __name__ == "__main__":
     app.run(host='127.2.3.1', port=4080, debug=True)
