@@ -1,68 +1,84 @@
 from flask import Flask, request, jsonify
+import json
+import pandas as pd
+import re
 
 app = Flask(__name__)
 
-def max_risk_mitigation(n, m, costs):
-    max_mitigation = 0
+# Your existing JSON processing function
+def process_json(data):
 
-    for i in range(m):
-        for j in range(i + 1, m):
-            risk_mitigation = costs[j] - costs[i]
+    all_list=[]
+    for inputs_set in data['inputs']:
+        List=[]
+        n=inputs_set[0]
+        names=re.split('\s', inputs_set[1])
 
-            if risk_mitigation > max_mitigation:
-                max_mitigation = risk_mitigation
+        for i in range(2,len(inputs_set)):
+            List.append(inputs_set[i])
 
-    return max_mitigation
+        xy_split = [tuple(map(int, value.split())) for value in List]
 
-def validate_inputs(inputs):
-    for input_data in inputs:
-        if len(input_data) != 2:
-            return False
-        try:
-            n, m = map(int, input_data[0].split())
-            costs = list(map(int, input_data[1].split()))
-            if n < 0 or m < 0 or len(costs) != m:
-                return False
-        except ValueError:
-            return False
+        data = [{"name": name, "x": x, "y": y} for name, (x, y) in zip(names, xy_split)]
 
-    return True
+        df = pd.DataFrame(data)
 
-@app.route('/risk-mitigation', methods=['POST', 'GET'])
-def risk_mitigation():
+        df['abs_diff'] = abs(df['x'] - df['y'])
+        merged_list = list(set(df['x'].tolist() + df['y'].tolist()))
+
+        sorted_unique_elements = sorted(merged_list)
+        df_result = pd.DataFrame(sorted_unique_elements, columns=['x1'])
+
+        df_result['y1'] = df_result['x1'].shift(-1)
+
+        df_result = df_result[:-1]
+        df_result = df_result.astype(int)
+        df_result['Names'] = [[] for _ in range(len(inputs_set)-2)]
+
+        for i in range(len(df)):
+            row = df.iloc[i]
+            for j in range(len(df_result)):
+                row1 = df_result.iloc[j]
+
+                if row1['x1'] >= row['x'] and row['y'] >= row1['y1'] and row['abs_diff'] >= 0:
+                    #print(row['name'])
+                    df_result.at[j, 'Names'].append(row['name'])
+                    #print(df_result)
+                    row['abs_diff'] -= 1
+                    #print(row['abs_diff'])
+        df_result.insert(df_result.columns.get_loc("Names"), "NumStrings", df_result["Names"].apply(len))
+        df_result['Names'] = df_result['Names'].apply(sorted)
+        formatted_data = df_result.apply(lambda row: f"{row['x1']} {row['y1']} {row['NumStrings']} {' '.join(row['Names'])}", axis=1)
+
+        list_of_strings = formatted_data.tolist()
+
+        list_of_strings.insert(0, n)
+        #print(df_result)
+        all_list.append(list_of_strings)
+    result_dict = {"answer": all_list}
+    return result_dict
+
+
+# Expose a POST endpoint /time-intervals
+@app.route('/time-intervals', methods=['POST'])
+def time_intervals_post():
     if request.method == 'POST':
-        request_data = request.get_json()
-
-        if "inputs" in request_data:
-            inputs = request_data["inputs"]
-
-            if not validate_inputs(inputs):
-                return jsonify({"error": "Invalid input format"}), 400
-
-            results = []
-            for input_data in inputs:
-                n, m = map(int, input_data[0].split())
-                costs = list(map(int, input_data[1].split()))
-                result = max_risk_mitigation(n, m, costs)
-                results.append(result)
-
-            return jsonify({"answer": results})
-        else:
-            return jsonify({"error": "Invalid input format"}), 400
-    elif request.method == 'GET':
-        n = int(request.args.get('n', 0))
-        m = int(request.args.get('m', 0))
-        costs_str = request.args.get('costs', '')
-
         try:
-            costs = list(map(int, costs_str.split()))
-            if n < 0 or m < 0 or len(costs) != m or m < n:
-                return jsonify({"error": "Invalid input format"}), 400
-        except ValueError:
-            return jsonify({"error": "Invalid input format"}), 400
+            json_data = request.get_json()
+            result = process_json(json_data)
+            return jsonify(result)
+        except Exception as e:
+            return jsonify({"error": str(e)}), 400
 
-        result = max_risk_mitigation(n, m, costs)
-        return jsonify({"answer": result})
+# Expose a GET endpoint /time-intervals
+@app.route('/time-intervals', methods=['GET'])
+def time_intervals_get():
+    try:
+        json_data = request.args.get('json_data')
+        result = process_json(json_data)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=4089,debug=True)
+    app.run(host='0.0.0.0', port=4094,debug=True)
