@@ -12,7 +12,11 @@ def string_to_matrix(input, row, col, List):
 
     matrix1 = [list(row) for row in zip(*matrix)]
     res = ' '.join([''.join(row) for row in matrix1])
-    List.append(res)
+    result=res.strip()
+    result1=re.sub(' +',' ',result)
+    List.append(result1)
+
+
 
 
 
@@ -65,4 +69,4 @@ def main():
     # return jsonify({"status": "success", "message": "GET request processed."})
 
 if __name__ == "__main__":
-    app.run(host='127.2.3.1', port=4080, debug=True)
+    app.run(host='0.0.0.0', port=4080, debug=True)
