@@ -56,8 +56,11 @@ def process_json(data):
         list_of_strings.insert(0, n)
         # print(df_result)
         all_list.append(list_of_strings)
-    result_dict = {"answer": all_list}
-    return result_dict
+    #result_dict = {"answer": all_list}
+
+    return jsonify({"answer": all_list})
+
+#return result_dict
 
 
 # Expose a POST endpoint /time-intervals
