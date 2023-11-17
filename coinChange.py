@@ -56,11 +56,11 @@ def process_json(data):
         list_of_strings.insert(0, n)
         # print(df_result)
         all_list.append(list_of_strings)
-    #result_dict = {"answer": all_list}
+        result_dict = {"answer": all_list}
 
-    return jsonify({"answer": all_list})
 
-#return result_dict
+
+        return result_dict
 
 
 # Expose a POST endpoint /time-intervals
@@ -81,7 +81,8 @@ def time_intervals_get():
     try:
         json_data = request.args.get('json_data')
         result = process_json(json_data)
-        return jsonify(result)
+        #return jsonify(result)
+        return jsonify({"answer": result})
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
