@@ -3,6 +3,7 @@ import pandas as pd
 import re
 from flask import Flask, request, jsonify
 
+
 app = Flask(__name__)
 
 
@@ -56,11 +57,8 @@ def process_json(data):
         list_of_strings.insert(0, n)
         # print(df_result)
         all_list.append(list_of_strings)
-        result_dict = {"answer": all_list}
 
-
-
-        return result_dict
+    return all_list
 
 
 # Expose a POST endpoint /time-intervals
@@ -69,10 +67,16 @@ def time_intervals_post():
     if request.method == 'POST':
         try:
             json_data = request.get_json()
+            if json_data is None:
+                raise ValueError("Invalid JSON data")
+
+
             result = process_json(json_data)
-            return jsonify(result)
+            return jsonify({"answer": result})
         except Exception as e:
-            return jsonify({"error": str(e)}), 400
+            print(f"Error processing request: {str(e)}")
+            return jsonify({"error": "Internal server error"}), 500
+
 
 
 # Expose a GET endpoint /time-intervals
@@ -80,12 +84,14 @@ def time_intervals_post():
 def time_intervals_get():
     try:
         json_data = request.args.get('json_data')
+
+        if not json_data:
+            return jsonify({"error": "No inputs provided"}), 400
         result = process_json(json_data)
-        #return jsonify(result)
         return jsonify({"answer": result})
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=4094, debug=True)
+    app.run(host='0.0.0.0', port=4095, debug=True)
